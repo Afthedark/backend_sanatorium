@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 # Import dj-database-url at the beginning of the file.
 import dj_database_url
+from decouple import config
 
 
 from pathlib import Path
@@ -25,13 +26,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-z+d50n__fus84qg-s9vz0%%!o)gtctl)iv#!68-jn$r@r9w-b('
+SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config("DEBUG", cast=bool)
 
-ALLOWED_HOSTS = []
-
+#ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config("ALLOWED_HOSTS").split(",")
 
 # Application definition
 
@@ -97,7 +98,7 @@ DATABASES = {
 DATABASES = {
     'default': dj_database_url.config(
         # Replace this value with your local database's connection string.
-        default='postgresql://dbsanatorium_user:q9EWZpqd0ugTXWFEpU5uzXaGVOZPRhp8@dpg-cterptdds78s73djmuc0-a.oregon-postgres.render.com/dbsanatorium',
+        default=config("DATABASE_URL"),
         conn_max_age=600
     )
 }
