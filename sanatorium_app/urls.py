@@ -7,8 +7,8 @@ router = DefaultRouter()
 router.register(r'usuarios', UsuarioViewSet)
 router.register(r'proyectos', ProyectoViewSet)
 router.register(r'tareas', TareaViewSet)
-router.register(r'reportes', ReporteViewSet)
-router.register(r'metricas', MetricasViewSet)
+#router.register(r'reportes', ReporteViewSet)
+#router.register(r'metricas', MetricasViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
