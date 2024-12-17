@@ -5,11 +5,11 @@ https://www.youtube.com/watch?v=T1intZyhXDU
 
 
 ---------------------------------------------------------------------------------------
-para cargar el archivo requirements.txt desde otra maquina, ojo debe estar activo el entorno virtual primero
+para Instalar el archivo requirements.txt desde otra maquina, ojo debe estar activo el entorno virtual primero
 pip install -r "requirements.txt"
 
 ----------------------------------------------------------------------------------------
-para crear el archivo requirements.txt ojo debe estar activo el entorno virtual primero
+para Crear el archivo requirements.txt ojo debe estar activo el entorno virtual primero
 pip freeze > "requirements.txt"
 
 
