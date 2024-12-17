@@ -52,17 +52,10 @@ class Tarea(models.Model):
     empleado = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="tareas_asignadas")  # El empleado que registra la tarea
     estado = models.CharField(max_length=20, choices=ESTADOS_TAREA)  # Estado de la tarea
     archivo = models.FileField(upload_to='archivos_tareas/', null=True, blank=True)  # Archivo opcional (documento, foto, etc.)
-
+    orden = models.IntegerField(default=0)  # Campo para almacenar la posición de la tarea dentro de cada columna
+    
     def __str__(self):
         return f"Tarea de {self.titulo} - {self.descripcion[:20]}"
-
-class Reporte(models.Model):
-    proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE, related_name="reportes")
-    contenido = models.TextField()
-    fecha = models.DateField()
-
-    def __str__(self):
-        return f"Reporte de {self.proyecto.nombre} - {self.fecha}"
 
 class Metricas(models.Model):
     empleado = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="metricas")

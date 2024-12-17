@@ -1,6 +1,6 @@
 # gestion_proyectos/serializers.py
 from rest_framework import serializers
-from .models import Usuario, Proyecto, Tarea, Reporte, Metricas
+from .models import Usuario, Proyecto, Tarea
 
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
@@ -18,21 +18,15 @@ class TareaSerializer(serializers.ModelSerializer):
     proyecto = ProyectoSerializer()
     empleado = UsuarioSerializer()
     
+    # Agregar los campos para actualizar el estado y la posición de la tarea
     class Meta:
         model = Tarea
-        fields = ['id', 'titulo', 'descripcion', 'proyecto', 'fecha', 'horas_invertidas', 'empleado', 'estado', 'archivo']
+        fields = ['id', 'titulo', 'descripcion', 'proyecto', 'fecha', 'horas_invertidas', 'empleado', 'estado', 'archivo', 'orden']
 
-class ReporteSerializer(serializers.ModelSerializer):
-    proyecto = ProyectoSerializer()
-    
-    class Meta:
-        model = Reporte
-        fields = ['id', 'proyecto', 'contenido', 'fecha']
+    def update(self, instance, validated_data):
+        # Actualizamos los valores del estado y orden
+        instance.estado = validated_data.get('estado', instance.estado)
+        instance.orden = validated_data.get('orden', instance.orden)
+        instance.save()
+        return instance    
 
-class MetricasSerializer(serializers.ModelSerializer):
-    empleado = UsuarioSerializer()
-    proyecto = ProyectoSerializer()
-    
-    class Meta:
-        model = Metricas
-        fields = ['id', 'empleado', 'proyecto', 'horas_trabajadas', 'tareas_completadas', 'fecha']

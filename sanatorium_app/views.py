@@ -1,10 +1,15 @@
 from django.shortcuts import render
 
 # Create your views here.
-# gestion_proyectos/views.py
+
 from rest_framework import viewsets
-from .models import Usuario, Proyecto, Tarea, Reporte, Metricas
-from .serializers import UsuarioSerializer, ProyectoSerializer, TareaSerializer, ReporteSerializer, MetricasSerializer
+
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework import status
+
+from .models import Usuario, Proyecto, Tarea, Metricas
+from .serializers import UsuarioSerializer, ProyectoSerializer, TareaSerializer
 
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
@@ -18,11 +23,25 @@ class TareaViewSet(viewsets.ModelViewSet):
     queryset = Tarea.objects.all()
     serializer_class = TareaSerializer
 
-class ReporteViewSet(viewsets.ModelViewSet):
-    queryset = Reporte.objects.all()
-    serializer_class = ReporteSerializer
+    # Acción personalizada para actualizar el estado y la posición
+    @action(detail=True, methods=['patch'])
+    def mover_tarea(self, request, pk=None):
+        tarea = self.get_object()
+        estado = request.data.get('estado')
+        orden = request.data.get('orden')
 
-class MetricasViewSet(viewsets.ModelViewSet):
-    queryset = Metricas.objects.all()
-    serializer_class = MetricasSerializer
+        # Verifica si el estado o el orden fueron proporcionados
+        if estado:
+            tarea.estado = estado
+        if orden is not None:
+            tarea.orden = orden
+
+        tarea.save()
+
+        return Response({
+            'mensaje': 'Tarea movida correctamente',
+            'tarea': TareaSerializer(tarea).data
+        }, status=status.HTTP_200_OK)
+
+
 
