@@ -7,6 +7,7 @@ router = DefaultRouter()
 router.register(r'usuarios', UsuarioViewSet)
 router.register(r'proyectos', ProyectoViewSet)
 router.register(r'tareas', TareaViewSet)
+
 #router.register(r'reportes', ReporteViewSet)
 #router.register(r'metricas', MetricasViewSet)
 

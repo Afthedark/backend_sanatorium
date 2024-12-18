@@ -17,16 +17,15 @@ class ProyectoSerializer(serializers.ModelSerializer):
 class TareaSerializer(serializers.ModelSerializer):
     proyecto = ProyectoSerializer()
     empleado = UsuarioSerializer()
-    
-    # Agregar los campos para actualizar el estado y la posición de la tarea
+
     class Meta:
         model = Tarea
         fields = ['id', 'titulo', 'descripcion', 'proyecto', 'fecha', 'horas_invertidas', 'empleado', 'estado', 'archivo', 'orden']
 
+    # Este es para la actualización, pero ahora no solicitamos el estado y orden del cliente
     def update(self, instance, validated_data):
-        # Actualizamos los valores del estado y orden
-        instance.estado = validated_data.get('estado', instance.estado)
-        instance.orden = validated_data.get('orden', instance.orden)
+        # Los valores de estado y orden se manejan internamente en la vista
         instance.save()
-        return instance    
+        return instance
 
+#En cada tarea no puede tener el mismo numero de orden  repetido 
