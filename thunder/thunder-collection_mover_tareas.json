@@ -1,0 +1,53 @@
+{
+    "clientName": "Thunder Client",
+    "collectionName": "mover_tareas",
+    "collectionId": "48d62a0d-ef96-483d-a3ad-4aeb2ec10384",
+    "dateExported": "2024-12-19T21:16:01.046Z",
+    "version": "1.2",
+    "folders": [],
+    "requests": [
+        {
+            "_id": "6b2b239d-0d9a-4ac5-95ef-175b637f0952",
+            "colId": "48d62a0d-ef96-483d-a3ad-4aeb2ec10384",
+            "containerId": "",
+            "name": "http://127.0.0.1:8000/api/tareas/",
+            "url": "http://127.0.0.1:8000/api/tareas/",
+            "method": "GET",
+            "sortNum": 10000,
+            "created": "2024-12-19T21:15:13.120Z",
+            "modified": "2024-12-19T21:15:13.120Z",
+            "headers": []
+        },
+        {
+            "_id": "94f3f105-46c9-47a2-b5af-9a520d8aed64",
+            "colId": "48d62a0d-ef96-483d-a3ad-4aeb2ec10384",
+            "containerId": "",
+            "name": "http://localhost:8000/api/custom/actualizar-tarea/",
+            "url": "http://127.0.0.1:8000/api/custom/actualizar-tarea/",
+            "method": "POST",
+            "sortNum": 20000,
+            "created": "2024-12-19T21:15:23.628Z",
+            "modified": "2024-12-19T21:15:23.628Z",
+            "headers": [],
+            "body": {
+                "type": "formdata",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "id",
+                        "value": "6"
+                    },
+                    {
+                        "name": "nuevo_estado",
+                        "value": "en progreso"
+                    },
+                    {
+                        "name": "nuevo_orden",
+                        "value": "4"
+                    }
+                ]
+            }
+        }
+    ],
+    "ref": "d8QJ8onuas4Du8z0BH0jPDhtPqh_Ed7DF9Wm81kI2lv3VaPIVV8OAgobL0ndwo1BY4w29H6zfJUWbqSm5bqMSA"
+}

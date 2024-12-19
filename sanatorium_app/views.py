@@ -4,7 +4,7 @@ from django.shortcuts import render
 
 from rest_framework import viewsets
 
-from rest_framework.decorators import action
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -23,58 +23,69 @@ class TareaViewSet(viewsets.ModelViewSet):
     queryset = Tarea.objects.all()
     serializer_class = TareaSerializer
 
-    # Acción personalizada para actualizar el estado y la posición
-    @action(detail=True, methods=['patch'])
-    def mover_tarea(self, request, pk=None):
-        tarea = self.get_object()  # Obtiene la tarea por ID
 
-        # Obtener los datos enviados en la solicitud
-        estado = request.data.get('estado')
-        orden = request.data.get('orden')
+#Custom API de actualizar tarea
+@api_view(['POST'])
+def actualizar_tarea(request):
+    tarea_id = request.data.get('id')
+    nuevo_estado = request.data.get('nuevo_estado')
+    nuevo_orden = request.data.get('nuevo_orden')
 
-        # Verifica si el estado o el orden fueron proporcionados
-        if estado:
-            tarea.estado = estado
-        if orden is not None:
-            tarea.orden = orden
-        
-        # Obtener todas las tareas del usuario que está relacionado con esta tarea
-        tareas_usuario = Tarea.objects.filter(empleado=tarea.empleado)
+    if not tarea_id or not nuevo_estado:
+        return Response(
+            {"error": "El ID de la tarea y el nuevo estado son obligatorios."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
-        # Obtener todas las tareas del proyecto al que pertenece esta tarea
-        tareas_proyecto = Tarea.objects.filter(proyecto=tarea.proyecto)
+    try:
+        tarea = Tarea.objects.get(id=tarea_id)
 
-        # Guardar los cambios de la tarea
-        tarea.save()
+        # Validar estado
+        if nuevo_estado not in dict(Tarea.ESTADOS_TAREA):
+            return Response(
+                {"error": f"Estado no válido. Valores permitidos: {list(dict(Tarea.ESTADOS_TAREA).keys())}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-        # Responder con todos los datos relacionados en un solo objeto
-        return Response({
-            'id_proyecto': tarea.proyecto.id,
-            'mensaje': 'Tarea movida correctamente',
-            'tarea': TareaSerializer(tarea).data,
-            'tareas_relacionadas': {
-                'tareas_usuario': TareaSerializer(tareas_usuario, many=True).data,
-                'tareas_proyecto': TareaSerializer(tareas_proyecto, many=True).data
-            }
-        }, status=status.HTTP_200_OK)
+        # Actualizar estado y orden
+        tarea.estado = nuevo_estado
 
-    def perform_create(self, serializer):
-        # Obtener el proyecto y el usuario desde la solicitud
-        proyecto = self.request.data.get('proyecto')
-        empleado = self.request.data.get('empleado')
+        # Si se envía nuevo_orden, ajusta el orden de las demás tareas
+        if nuevo_orden is not None:
+            nuevo_orden = int(nuevo_orden)
 
-        # Obtener la última tarea para ese proyecto y usuario para calcular el nuevo orden
-        last_tarea = Tarea.objects.filter(
-            proyecto=proyecto,
-            empleado=empleado,
-            estado='pendiente'
-        ).order_by('-orden').first()  # Obtenemos la última tarea de ese proyecto y empleado
+            # Obtener todas las tareas del mismo estado excepto la actual
+            tareas_misma_columna = Tarea.objects.filter(
+                estado=nuevo_estado
+            ).exclude(id=tarea_id).order_by('orden')
 
-        # Si existe una tarea previa, establecemos el orden de la nueva tarea
-        if last_tarea:
-            nuevo_orden = last_tarea.orden + 1
+            # Ajustar los órdenes para incluir la tarea en la nueva posición
+            tareas_actualizadas = []
+            for i, t in enumerate(tareas_misma_columna, start=1):
+                if i == nuevo_orden:  # Insertar la tarea actual en el nuevo orden
+                    tarea.orden = i
+                    tareas_actualizadas.append(tarea)
+                    i += 1  # Incrementar para las siguientes tareas
+
+                t.orden = i
+                tareas_actualizadas.append(t)
+
+            # Si el nuevo_orden es mayor que los existentes, simplemente colócala al final
+            if nuevo_orden > len(tareas_misma_columna):
+                tarea.orden = len(tareas_misma_columna) + 1
+                tareas_actualizadas.append(tarea)
+
+            # Guardar todas las tareas reordenadas
+            Tarea.objects.bulk_update(tareas_actualizadas, ['orden'])
+
         else:
-            nuevo_orden = 1  # Si no hay tareas, la nueva tarea será la primera
+            # Si no se especifica un nuevo orden, coloca la tarea al final
+            max_orden = Tarea.objects.filter(estado=nuevo_estado).aggregate(models.Max('orden'))['orden__max'] or 0
+            tarea.orden = max_orden + 1
 
-        # Crear la tarea con el estado "pendiente" y el nuevo orden calculado
-        serializer.save(estado='pendiente', orden=nuevo_orden)
+        tarea.save()
+        serializer = TareaSerializer(tarea)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    except Tarea.DoesNotExist:
+        return Response({"error": "Tarea no encontrada."}, status=status.HTTP_404_NOT_FOUND)

@@ -57,12 +57,4 @@ class Tarea(models.Model):
     def __str__(self):
         return f"Tarea de {self.titulo} - {self.descripcion[:20]}"
 
-class Metricas(models.Model):
-    empleado = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="metricas")
-    proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE, related_name="metricas")
-    horas_trabajadas = models.IntegerField()
-    tareas_completadas = models.IntegerField()
-    fecha = models.DateField()
 
-    def __str__(self):
-        return f"Métricas de {self.empleado.nombre} - {self.proyecto.nombre} - {self.fecha}"
