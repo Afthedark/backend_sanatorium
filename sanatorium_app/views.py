@@ -56,8 +56,12 @@ def actualizar_tarea(request):
 
             # Obtener todas las tareas del mismo estado excepto la actual
             tareas_misma_columna = Tarea.objects.filter(
+                proyecto = tarea.proyecto,
+                empleado = tarea.empleado,
                 estado=nuevo_estado
             ).exclude(id=tarea_id).order_by('orden')
+
+            # DEBUG no excluir la tarea actual
 
             # Ajustar los órdenes para incluir la tarea en la nueva posición
             tareas_actualizadas = []
@@ -69,6 +73,7 @@ def actualizar_tarea(request):
 
                 t.orden = i
                 tareas_actualizadas.append(t)
+            
 
             # Si el nuevo_orden es mayor que los existentes, simplemente colócala al final
             if nuevo_orden > len(tareas_misma_columna):

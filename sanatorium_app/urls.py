@@ -15,3 +15,4 @@ urlpatterns = [
     path('custom/actualizar-tarea/', actualizar_tarea, name='actualizar_tarea'),  # Custom API
 ]
 
+#Custom endpoints para crear, eliminar y actualizar tareas para todos desde el tunder client 
